@@ -62,7 +62,7 @@ class PowerUp(pygame.sprite.Sprite):
             self.kill()
 
         if self.rect.y > HEIGHT - 50:
-            sprites.add(Explosion("BLOCK_EXPLOSION_IMAGES",
+            sprites.add(Explosion('BLOCK_EXPLOSION_IMAGES',
                                   self.rect.centerx, self.rect.centery))
             powerups.remove(self)
             self.kill()
@@ -180,7 +180,7 @@ class FireExplosion(Explosion):
 
     def __init__(self, x: int, y: int):
 
-        super().__init__("FIRE_EXPLOSION_IMAGES", x, y)
+        super().__init__('FIRE_EXPLOSION_IMAGES', x, y)
 
     def update(self):
 
@@ -255,14 +255,14 @@ class Ball(pygame.sprite.Sprite):
             # Collision with Walls
             wall = pygame.sprite.spritecollideany(self, walls)
             if wall:
-                if wall.side == "top":
+                if wall.side == 'top':
                     self.velocity.y *= -1
                 else:
                     self.velocity.x *= -1
 
             # Ball missed
             if self.rect.y > paddle.rect.bottom:
-                sprites.add(Explosion("BLOCK_EXPLOSION_IMAGES",
+                sprites.add(Explosion('BLOCK_EXPLOSION_IMAGES',
                                       self.rect.centerx, self.rect.centery))
                 balls.remove(self)
                 self.kill()
@@ -297,13 +297,13 @@ class Wall(pygame.sprite.Sprite):
         super().__init__()
 
         self.side = side
-        if side == "top":
+        if side == 'top':
             self.image = pygame.Surface((1366, 12))
         else:
-            self.image = pygame.Surface((12, 768))
+            self.image = WALL_IMAGE
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        if side == "right":
+        if side == 'right':
             self.rect.topleft = Vector2(WIDTH - 12, 0)
         else:
             self.rect.topleft = Vector2(0, 0)
@@ -381,8 +381,8 @@ class Paddle(pygame.sprite.Sprite):
     def get_smaller(self) -> None:
         if (self.width > 40):
             for i in range(paddle.width // 40):
-                sprites.add(Explosion("PADDLE_EXPLOSION_IMAGES", paddle.rect.centerx - i * 20, paddle.rect.centery - 7),
-                            Explosion("PADDLE_EXPLOSION_IMAGES", paddle.rect.centerx + i * 20, paddle.rect.centery - 7))
+                sprites.add(Explosion('PADDLE_EXPLOSION_IMAGES', paddle.rect.centerx - i * 20, paddle.rect.centery - 7),
+                            Explosion('PADDLE_EXPLOSION_IMAGES', paddle.rect.centerx + i * 20, paddle.rect.centery - 7))
             self.width -= 40
 
         else:
@@ -419,10 +419,13 @@ class Block(Target):
 
     def destroy(self):
 
-        sprites.add(Explosion("BLOCK_EXPLOSION_IMAGES",
+        sprites.add(Explosion('BLOCK_EXPLOSION_IMAGES',
                               self.rect.centerx, self.rect.centery))
         blocks.remove(self)
         self.kill()
+        
+        global score
+        score += 10
 
 
 class Brick(Target):
@@ -434,14 +437,17 @@ class Brick(Target):
     def destroy(self):
 
         if self.life == 2:
-            sprites.add(Explosion("PUFF_SMOKE_IMAGES",
+            sprites.add(Explosion('PUFF_SMOKE_IMAGES',
                                   self.rect.centerx, self.rect.centery))
             self.life = 1
             self.image = BRICK_IMAGES[0]
+            
+            global score
+            score += 5
 
         else:
 
-            sprites.add(Explosion("BRICK_EXPLOSION_IMAGES",
+            sprites.add(Explosion('BRICK_EXPLOSION_IMAGES',
                                   self.rect.centerx, self.rect.centery))
             powerups.add(random.choice([BallPowerUp(self.rect.centerx, self.rect.centery),
                                         x3PowerUp(self.rect.centerx,
@@ -453,6 +459,8 @@ class Brick(Target):
                                         FirePowerUp(self.rect.centerx, self.rect.centery)]))
             blocks.remove(self)
             self.kill()
+            
+            score += 50
 
 
 class Lava(Target):
@@ -474,6 +482,9 @@ class Lava(Target):
         sprites.add(FireExplosion(self.rect.centerx, self.rect.centery))
         blocks.remove(self)
         self.kill()
+        
+        global score
+        score += 100
 
 
 def display_splash_screen() -> None:
@@ -491,7 +502,7 @@ def load_sprites() -> None:
     # Walls
     global walls
     walls = pygame.sprite.Group()
-    for side in ("top", "left", "right"):
+    for side in ('top', 'left', 'right'):
         walls.add(Wall(side))
 
     # Paddle
@@ -516,19 +527,23 @@ def load_sprites() -> None:
 def next_level() -> None:
     global level
     level += 1
-    with open("levels\\{}.txt".format(level)) as file:
-        rows = file.readlines()
-        for i in range(len(rows)):
-            for j in range(len(rows[i])):
-                char = rows[i][j]
-                index = ord(char) - ord("a")
-                if index in range(25):
-                    blocks.add(
-                        Block(BLOCK_IMAGES[index], 48 * j + 12, 24 * i + 12))
-                elif char == "1":
-                    blocks.add(Brick(48 * j + 12, 24 * i + 12))
-                elif char == "2":
-                    blocks.add(Lava(48 * j + 12, 24 * i + 12))
+    try:
+        with open('levels\\{}.txt'.format(level)) as file:
+            rows = file.readlines()
+            for i in range(len(rows)):
+                for j in range(len(rows[i])):
+                    char = rows[i][j]
+                    index = ord(char) - ord('a')
+                    if index in range(25):
+                        blocks.add(
+                            Block(BLOCK_IMAGES[index], 48 * j + 12, 24 * i + 12))
+                    elif char == '1':
+                        blocks.add(Brick(48 * j + 12, 24 * i + 12))
+                    elif char == '2':
+                        blocks.add(Lava(48 * j + 12, 24 * i + 12))
+    except:
+        level = 0
+        next_level()
 
 
 def __main__() -> None:
@@ -541,7 +556,16 @@ def __main__() -> None:
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, 64)
 
     # Title
-    pygame.display.set_caption("Breakout!")
+    pygame.display.set_caption('Breakout!')
+    
+    # Font
+    font = pygame.font.Font('ToThePointRegular.ttf', 72)
+    
+    # Score
+    global score
+    score = 0
+    score_text = font.render(str(score), True, WHITE)
+    score_rect = pygame.Rect(24, 0, 400, 100)
 
     # Clock
     clock = pygame.time.Clock()
@@ -602,6 +626,10 @@ def __main__() -> None:
                 new_ball = Ball(paddle.rect.centerx, paddle.rect.y - 5)
                 balls.add(new_ball)
 
+            # The score
+            score_text = font.render(str(score), True, WHITE) 
+            screen.blit(score_text, score_rect)
+            
             # Update sprites
             sprites.update()
             powerups.update()
@@ -635,6 +663,7 @@ def __main__() -> None:
             sprites.draw(screen)
             balls.draw(screen)
             powerups.draw(screen)
+            
 
         # Event Handling
         for event in pygame.event.get():
@@ -671,6 +700,6 @@ def __main__() -> None:
     pygame.quit()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     __main__()
