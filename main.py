@@ -487,6 +487,41 @@ class Lava(Target):
         score += 100
 
 
+class LevelText(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = font.render("Level {}".format(level), True, WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.centerx, self.rect.top = 0, HEIGHT
+        
+        self.distance = math.sqrt(WIDTH ** 2 + HEIGHT ** 2)
+        self.displacement = 0
+        
+        self.velocity = Vector2()
+
+        sprites.add(self)
+    def update(self):
+        
+        self.displacement = math.sqrt(self.rect.centerx ** 2 + self.rect.centery ** 2)
+        
+        self.offset = abs(self.displacement - self.distance / 2)
+        
+        self.velocity.x = (self.offset * 16 / 60 + 1)
+        self.velocity.y = -(self.offset * 9 / 60 + 1)
+        
+        if self.velocity.x < 1:
+            self.velocity.x = 1
+            
+        if self.velocity.y > -1:
+            self.velocity.y = -1
+        
+        self.rect = self.rect.move(self.velocity)
+        
+        if self.rect.bottom < 0:
+            self.kill()
+            sprites.remove(self)
+
+
 def display_splash_screen() -> None:
 
     title_animation.update()
@@ -524,6 +559,7 @@ def load_sprites() -> None:
     powerups = pygame.sprite.Group()
 
 
+
 def next_level() -> None:
     global level
     level += 1
@@ -544,6 +580,8 @@ def next_level() -> None:
     except:
         level = 0
         next_level()
+        
+    LevelText()
 
 
 def __main__() -> None:
@@ -559,9 +597,19 @@ def __main__() -> None:
     pygame.display.set_caption('Breakout!')
     
     # Font
-    font = pygame.font.Font('ToThePointRegular.ttf', 72)
+    global font
+    font = pygame.font.Font('ToThePointRegular.ttf', 100)
     
-    # Score
+    # 'Click to Continue'
+    continue_text = font.render("CLICK TO CONTINUE", True, WHITE)
+    continue_rect = continue_text.get_rect()
+    continue_rect.center = CENTER[0], HEIGHT - 300
+   
+    # Level
+    global level
+    level = 0
+    
+    # Score Rect
     global score
     score = 0
     score_text = font.render(str(score), True, WHITE)
@@ -575,9 +623,6 @@ def __main__() -> None:
     title_animation = pygame.sprite.GroupSingle()
     title_animation.add(Animation(WIDTH / 2, 200))
 
-    # Level
-    global level
-    level = 0
 
     load_sprites()
 
@@ -602,6 +647,7 @@ def __main__() -> None:
         if not game_started:
 
             display_splash_screen()
+            screen.blit(continue_text, continue_rect)
 
         elif fadeout:
             black_screen.set_alpha(alpha)
@@ -628,7 +674,6 @@ def __main__() -> None:
 
             # The score
             score_text = font.render(str(score), True, WHITE) 
-            screen.blit(score_text, score_rect)
             
             # Update sprites
             sprites.update()
@@ -664,6 +709,7 @@ def __main__() -> None:
             balls.draw(screen)
             powerups.draw(screen)
             
+            screen.blit(score_text, score_rect)
 
         # Event Handling
         for event in pygame.event.get():

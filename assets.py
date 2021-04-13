@@ -39,7 +39,7 @@ def load_images(folder: str, n: int, prefix: str = '') -> list:
 TITLE_ANIMATION = load_images('title_animation', 180, '4220108e60f146e7c576ae98600b1196dcXP12mFsrGfmBzD-')
 
 # Load Backgroud Image
-BACKGROUND_IMAGE =  pygame.transform.scale(pygame.image.load('background1.png'), (WIDTH, HEIGHT))
+BACKGROUND_IMAGE =  pygame.transform.scale(pygame.image.load('background.png'), (WIDTH, HEIGHT))
 
 # Load Block Tile Set
 BLOCK_IMAGES = load_tileset('tilesets\\block_tileset.png', 48, 24)
