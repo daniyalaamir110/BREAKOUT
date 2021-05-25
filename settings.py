@@ -1,6 +1,5 @@
 import math
 from random import choice
-import pygame
 
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -16,9 +15,10 @@ HEIGHT = 768
 CENTER = WIDTH / 2, HEIGHT / 2
 
 BALL_SPEED = 6
+PADDLE_WIDTH = 80
+PADDLE_HEIGHT = 16
 
 FPS = 60
 
 def get_random_color() -> tuple:
-    return choice([BLACK, RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE])
-
+  return choice([BLACK, RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE])
