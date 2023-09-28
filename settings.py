@@ -1,4 +1,3 @@
-import math
 from random import choice
 
 BLACK = (0, 0, 0)
@@ -20,5 +19,6 @@ PADDLE_HEIGHT = 16
 
 FPS = 60
 
+
 def get_random_color() -> tuple:
-  return choice([BLACK, RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE])
+    return choice([BLACK, RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE])
