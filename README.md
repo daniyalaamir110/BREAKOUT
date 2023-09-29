@@ -24,10 +24,8 @@ Follow these steps to set up the project on your machine:
 1. Clone the GitHub repository to your local machine:
 
    ```
-   git clone https://github.com/your-username/BREAKOUT.git
+   git clone https://github.com/daniyalaamir110/BREAKOUT.git
    ```
-
-   Replace `your-username` with your GitHub username.
 
 2. Navigate to the project directory:
 
