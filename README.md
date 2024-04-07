@@ -105,4 +105,4 @@ python main.py
 
 - This game was created by [Daniyal Aamir (daniyalaamir110)](https://github.com/daniyalaamir110).
 
-Enjoy playing **BREAKOUT**!
+Enjoy playing **BREAKOUT**! Don't forget to give a ⭐
